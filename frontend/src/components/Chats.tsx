@@ -152,7 +152,7 @@ const Chats = () => {
           key={chat.id}
           onClick={() => setActiveUserchatClicked(chat.id)}
           className={`p-2 flex justify-between w-full items-center cursor-pointer border-pink-500 border-b  shadow-lg mt-3 
-            ${activeUserChatClicked === chat.id ? "bg-pink-200" : "bg-gray-200"}
+            ${activeUserChatClicked === chat.id ? "bg-pink-200" : "bg-gray-100"}
             `}
         >
           <Avatar seed={chat.avatarSeed} />

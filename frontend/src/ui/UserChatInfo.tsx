@@ -5,7 +5,7 @@ import Avatar from "../utils/Avatar";
 const UserChatInfo = () => {
   return (
     <div className="w-full">
-      <div className=" w-full p-2 bg-gray-100 flex justify-between items-center ">
+      <div className=" w-full p-2 bg-gray-200 flex justify-between items-center ">
         <Avatar seed="aham" />
 
         <div className="flex flex-col w-[84%]">

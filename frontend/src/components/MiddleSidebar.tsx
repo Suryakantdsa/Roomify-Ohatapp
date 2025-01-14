@@ -24,7 +24,7 @@ const MiddleSidebar = () => {
         </div>
 
         {/* search bar */}
-        <div className="flex items-center px-4 gap-x-6 rounded-md bg-pink-100 w-full h-12 mt-6 mb-2 ">
+        <div className="flex items-center px-4 gap-x-6 rounded-md bg-gray-200 w-full h-12 mt-6 mb-2 ">
           {isSearching ? (
             <Search size={15} />
           ) : (
@@ -44,7 +44,7 @@ const MiddleSidebar = () => {
           <input
             type="text"
             placeholder={`${isSearching ? "Search" : ""}`}
-            className="h-full bg-pink-100 text-black outline-none border-none"
+            className="h-full bg-gray-200 text-black outline-none border-none"
             onFocus={() => {
               SetSearching(false);
             }}
