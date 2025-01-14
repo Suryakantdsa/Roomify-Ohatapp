@@ -5,7 +5,7 @@ import {
   Search,
 } from "lucide-react";
 import { useState } from "react";
-import Avatar from "../utils/Avatar";
+import Chats from "./Chats";
 
 const MiddleSidebar = () => {
   const [isSearching, SetSearching] = useState(true);
@@ -24,7 +24,7 @@ const MiddleSidebar = () => {
         </div>
 
         {/* search bar */}
-        <div className="flex items-center px-4 gap-x-6 rounded-md bg-gray-200 w-full h-12 my-4 ">
+        <div className="flex items-center px-4 gap-x-6 rounded-md bg-pink-100 w-full h-12 mt-6 mb-2 ">
           {isSearching ? (
             <Search size={15} />
           ) : (
@@ -44,7 +44,7 @@ const MiddleSidebar = () => {
           <input
             type="text"
             placeholder={`${isSearching ? "Search" : ""}`}
-            className="h-full bg-gray-200 text-black outline-none border-none"
+            className="h-full bg-pink-100 text-black outline-none border-none"
             onFocus={() => {
               SetSearching(false);
             }}
@@ -52,140 +52,21 @@ const MiddleSidebar = () => {
         </div>
 
         {/* chat user */}
-        <div className="h-screen overflow-y-auto custom-scrollbar ">
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg ">
+        {/* <div className="h-screen overflow-y-auto custom-scrollbar ">
+          <div className="p-2 flex justify-between w-full items-center bg-gray-300  border-pink-500 border-b  shadow-lg ">
             <Avatar seed="add" />
             <div className="w-[80%]">
               <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
+                <span className="font-bold text-xl">Name</span>
+                <span className="text-sm font-semibold">25/02/2025</span>
               </div>
               <div className="text-xs w-full">
                 Lorem ipsum dolor sit amesdjkbfbjndt !...
               </div>
             </div>
           </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-          <div className="p-2 flex justify-between w-full items-center bg-gray-100 border-pink-500 border-b shadow-lg mt-4">
-            <Avatar seed="add" />
-            <div className="w-[80%]">
-              <div className="flex justify-between items-center ">
-                <span className="font-bold text-lg">Name</span>
-                <span className="text-sm">25/02/2025</span>
-              </div>
-              <div className="text-xs w-full">
-                Lorem ipsum dolor sit amesdjkbfbjndt !...
-              </div>
-            </div>
-          </div>
-        </div>
+        </div> */}
+        <Chats />
       </nav>
     </aside>
   );
