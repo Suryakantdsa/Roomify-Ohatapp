@@ -6,6 +6,7 @@ const UserChatBar = () => {
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
+      //alert(message);
       console.log("Message sent:", message); // Replace with actual send logic
       setMessage(""); // Clear the input after sending
     }

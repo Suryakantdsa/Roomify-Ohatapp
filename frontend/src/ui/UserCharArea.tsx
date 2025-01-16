@@ -30,7 +30,7 @@ const UserChatArea = () => {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+    <div className="flex-1 overflow-y-auto p-4 bg-gray-50 custom-scrollbar">
       <div className="space-y-4">
         {messages.map((message) => (
           <div
