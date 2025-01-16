@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id               String    @id @default(uuid())
+//   email            String    @unique
+//   password         String
+//   name             String?
+//   photo            String?
+//   rooms            Room[]    @relation("UserRooms")
+//   chats            Chat[]    @relation("SenderChats")
+//   received         Chat[]    @relation("ReceivedChats")
+//   sentMessages     Message[] @relation("SentMessages")
+//   receivedMessages Message[] @relation("ReceivedMessages")
+// }
+
+// model Room {
+//   id        Int      @id @default(autoincrement())
+//   slug      String   @unique
+//   createdAt DateTime @default(now())
+//   adminId   String
+//   admin     User     @relation("UserRooms", fields: [adminId], references: [id])
+//   users    User @relation("UserRooms")
+//   chats     Chat[]
+// }
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  name             String?
+  photo            String?
+  adminRooms       Room[]    @relation("AdminRooms")
+  rooms            Room[]    @relation("UserRooms")
+  chats            Chat[]    @relation("SenderChats")
+  received         Chat[]    @relation("ReceivedChats")
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+}
+
+model Room {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  adminId   String
+  admin     User     @relation("AdminRooms", fields: [adminId], references: [id])
+  users     User[]   @relation("UserRooms")
+  chats     Chat[]
+}
+
+model Chat {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  roomId     Int
+  room       Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  senderId   String
+  sender     User      @relation("SenderChats", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User      @relation("ReceivedChats", fields: [receiverId], references: [id])
+  messages   Message[] @relation("ChatMessages")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  message    String
+  createdAt  DateTime @default(now())
+  chatId     Int
+  chat       Chat     @relation("ChatMessages", fields: [chatId], references: [id], onDelete: Cascade)
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  status     Status   @default(SENT) // Options: SENT, DELIVERED, READ
+}
+
+enum Status {
+  SENT
+  DELIVERED
+  READ
+}
