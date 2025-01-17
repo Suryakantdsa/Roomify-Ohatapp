@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { CreateUserSchema, SigninSchema } from "./Zodvalidator/types";
+import bcrypt from "bcrypt";
+import { CreateUserSchema, SigninSchema } from "./Zodvalidator/User";
 import { middleware } from "./middleware/middleware";
+import { Room_POST, RoomPOST } from "./Zodvalidator/Room";
 const { chat, user, room, message } = new PrismaClient();
 
 const app = express();
-
 const JWT_SECRET = process.env.JWT_SECRET || "skjd";
 const PORT = process.env.PORT || 8080;
 
@@ -22,12 +23,11 @@ app.post("/signup", async (req, res) => {
     });
     return;
   }
-  // db call
-
+  const hashedPassword = await bcrypt.hash(parsedData.data?.password, 10);
   const userdetails = await user.create({
     data: {
       email: parsedData.data?.username,
-      password: parsedData.data?.password,
+      password: hashedPassword,
     },
   });
 
@@ -69,43 +69,28 @@ app.post("/signin", async (req, res) => {
   res.json({ token });
 });
 
-app.post("/v1/create-room", middleware, async (req, res) => {});
-app.get("/v1/get-room-details/:id", middleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const roomDetails = await room.findUnique({ where: { id: parseInt(id) } });
+app.post("/v1/create-room", middleware, async (req, res) => {
+  const parseResult = Room_POST.safeParse(req.body);
 
-    if (!roomDetails) {
-      res.status(404).json({ message: "Room not found" });
-      return;
-    }
-
-    res.status(200).json(roomDetails);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  if (!parseResult.success) {
+    return res.status(400).json({ error: "Invalid input" });
   }
-});
 
-app.get("/message", middleware, async (req, res) => {
-  const messages = await message.findMany({
-    where: {
-      chatId: chat_id,
-      OR: [{ senderId: req.user }, { receiverId: recever.id }],
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
-});
-app.get("/chats", middleware, async (req, res) => {
-  const allChats = await chat.findMany({
-    where: {
-      sender: req.user,
-    },
-    include: {
-      receiver: true,
-    },
-  });
+  const { slug } = parseResult.data;
+
+  try {
+    // Example database operation using the slug
+    const newRoom = await room.create({
+      data: {
+        slug,
+        adminId: req.userId as string,
+      },
+    });
+
+    res.status(201).json(newRoom);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create room" });
+  }
 });
 
 app.listen(PORT, () => {
