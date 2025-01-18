@@ -9,7 +9,6 @@ The project consists of the following packages:
 - **ws-backend**: WebSocket server for real-time messaging.
 - **http-backend**: HTTP server for REST API services.
 - **react-frontend**: React-based frontend for the chat application.
-- **nextjs**: A Next.js app for additional features or integrations.
 
 ## Prerequisites
 
