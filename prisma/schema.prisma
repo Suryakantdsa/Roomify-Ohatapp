@@ -89,3 +89,153 @@ enum Status {
   DELIVERED
   READ
 }
+
+/**
+ * // Schema for WhatsApp-like chat application
+ * model User {
+ * id        Int      @id @default(autoincrement())
+ * email     String   @unique
+ * name      String
+ * avatar    String?
+ * createdAt DateTime @default(now())
+ * updatedAt DateTime @updatedAt
+ * // Relations
+ * rooms         RoomParticipant[]
+ * sentMessages     Message[]        @relation("SentMessages")
+ * receivedMessages Message[]        @relation("ReceivedMessages")
+ * groupsOwned   Room[]           @relation("RoomOwner")
+ * }
+ * model Room {
+ * id        Int      @id @default(autoincrement())
+ * name      String?  // Null for direct messages
+ * isGroup   Boolean  @default(false)
+ * createdAt DateTime @default(now())
+ * updatedAt DateTime @updatedAt
+ * ownerId   Int?     // Only for groups
+ * // Relations
+ * owner       User?            @relation("RoomOwner", fields: [ownerId], references: [id])
+ * participants RoomParticipant[]
+ * messages     Message[]
+ * }
+ * model RoomParticipant {
+ * id        Int      @id @default(autoincrement())
+ * userId    Int
+ * roomId    Int
+ * joinedAt  DateTime @default(now())
+ * isAdmin   Boolean  @default(false)
+ * // Relations
+ * user      User     @relation(fields: [userId], references: [id])
+ * room      Room     @relation(fields: [roomId], references: [id])
+ * @@unique([userId, roomId])
+ * }
+ * model Message {
+ * id         Int      @id @default(autoincrement())
+ * content    String
+ * senderId   Int
+ * receiverId Int?     // For direct messages
+ * roomId     Int
+ * createdAt  DateTime @default(now())
+ * updatedAt  DateTime @updatedAt
+ * isRead     Boolean  @default(false)
+ * // Relations
+ * sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+ * receiver  User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+ * room      Room     @relation(fields: [roomId], references: [id])
+ * }
+ * import { Router, Request, Response } from 'express';
+ * import { PrismaClient } from '@prisma/client';
+ * const router = Router();
+ * const prisma = new PrismaClient();
+ * // Get sidebar chats (rooms + direct messages)
+ * router.get('/chats', async (req: Request, res: Response) => {
+ * const userId = req.userId; // From auth middleware
+ * try {
+ * // Get all rooms user is part of
+ * const rooms = await prisma.roomParticipant.findMany({
+ * where: { userId: parseInt(userId) },
+ * include: {
+ * room: {
+ * include: {
+ * messages: {
+ * orderBy: { createdAt: 'desc' },
+ * take: 1, // Get latest message
+ * },
+ * participants: {
+ * include: { user: true }
+ * }
+ * }
+ * }
+ * }
+ * });
+ * // Format the response for sidebar
+ * const sidebarChats = rooms.map(room => ({
+ * id: room.roomId,
+ * name: room.room.isGroup ? room.room.name :
+ * room.room.participants.find(p => p.userId !== parseInt(userId))?.user.name,
+ * isGroup: room.room.isGroup,
+ * lastMessage: room.room.messages[0]?.content || null,
+ * lastMessageTime: room.room.messages[0]?.createdAt || null,
+ * unreadCount: await prisma.message.count({
+ * where: {
+ * roomId: room.roomId,
+ * isRead: false,
+ * NOT: { senderId: parseInt(userId) }
+ * }
+ * })
+ * }));
+ * res.json(sidebarChats);
+ * } catch (error) {
+ * res.status(500).json({ error: 'Failed to fetch chats' });
+ * }
+ * });
+ * // Get messages for a specific chat
+ * router.get('/messages/:roomId', async (req: Request, res: Response) => {
+ * const userId = req.userId;
+ * const { roomId } = req.params;
+ * const page = parseInt(req.query.page as string) || 1;
+ * const pageSize = 50;
+ * try {
+ * // Verify user is part of the room
+ * const participant = await prisma.roomParticipant.findUnique({
+ * where: {
+ * userId_roomId: {
+ * userId: parseInt(userId),
+ * roomId: parseInt(roomId)
+ * }
+ * }
+ * });
+ * if (!participant) {
+ * return res.status(403).json({ error: 'Not authorized to access this chat' });
+ * }
+ * // Get messages with pagination
+ * const messages = await prisma.message.findMany({
+ * where: { roomId: parseInt(roomId) },
+ * include: {
+ * sender: {
+ * select: {
+ * id: true,
+ * name: true,
+ * avatar: true
+ * }
+ * }
+ * },
+ * orderBy: { createdAt: 'desc' },
+ * skip: (page - 1) * pageSize,
+ * take: pageSize
+ * });
+ * // Mark messages as read
+ * await prisma.message.updateMany({
+ * where: {
+ * roomId: parseInt(roomId),
+ * isRead: false,
+ * NOT: { senderId: parseInt(userId) }
+ * },
+ * data: { isRead: true }
+ * });
+ * res.json(messages);
+ * } catch (error) {
+ * res.status(500).json({ error: 'Failed to fetch messages' });
+ * }
+ * });
+ * export default router;
+ */
