@@ -67,16 +67,7 @@ const Dashboard = () => {
               <Avatar seed="johndoe" />
               <Avatar seed="surya" />
               <Avatar seed="sashi" />
-              {/* <img
-                src="https://via.placeholder.com/40"
-                alt="avatar1"
-                className="w-10 h-10 rounded-full cursor-pointer border border-gray-300 hover:border-pink-700"
-              />
-              <img
-                src="https://via.placeholder.com/40"
-                alt="avatar2"
-                className="w-10 h-10 rounded-full cursor-pointer border border-gray-300 hover:border-pink-700"
-              />
+              {/*           
               <img
                 src="https://via.placeholder.com/40"
                 alt="avatar3"
