@@ -1,60 +1,157 @@
 # Roomify
 
-Roomify is a real-time chat application built using WebSockets. Users can create rooms, chat within rooms, or send direct messages to other users.
+Roomify is a real-time chat application designed for seamless communication using WebSockets. It allows users to create rooms, chat within rooms, and send direct messages to other users. This project is built using a Turborepo for monorepo management and utilizes `pnpm` as the package manager.
 
 ## Project Structure
-- **backend/**: Contains the server-side code.
-- **frontend/**: Contains the client-side code.
+
+The project consists of the following packages:
+
+- **ws-backend**: WebSocket server for real-time messaging.
+- **http-backend**: HTTP server for REST API services.
+- **react-frontend**: React-based frontend for the chat application.
+- **nextjs**: A Next.js app for additional features or integrations.
+
+## Prerequisites
+
+Ensure you have the following installed on your system:
+
+- [Node.js](https://nodejs.org/)
+- [pnpm](https://pnpm.io/installation)
 
 ## Getting Started
 
-### Prerequisites
-Ensure you have the following installed on your system:
-- [Node.js](https://nodejs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
+### Clone the Repository
 
-### Backend Setup
+```bash
+git clone https://github.com/your-repo/roomify.git
+cd roomify
+```
+
 1. Navigate to the `backend` folder:
    ```bash
    cd backend
    ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Build the TypeScript code:
-   ```bash
-   npm run build
-   ```
-4. Start the server:
-   ```bash
-   npm start
-   ```
-   The WebSocket server will be running on `ws://localhost:8080`.
 
-### Frontend Setup
-1. Navigate to the `frontend` folder:
+### Backend Setup
+
+2. Install all dependencies using pnpm:
+
+```bash
+pnpm install
+```
+
+2. Start all applications simultaneously::
+
+```bash
+pnpm run dev
+```
+
+This command runs all the apps in parallel using Turborepo.
+
+- ws-backend: Available at ws://localhost:8080
+- http-backend: Available at http://localhost:8001
+- react-frontend: Available at http://localhost:5173
+- nextjs: Available at http://localhost:3001
+
+## Individual Applications
+
+### WebSocket Backend (apps/ws-backend)
+
+1. Navigate to the WebSocket backend folder:
+
    ```bash
-   cd frontend
+   cd apps/ws-backend
    ```
+
 2. Install dependencies:
+
    ```bash
-   npm install
+   pnpm install
    ```
-3. Start the frontend development server:
+
+3. Start the WebSocket server:
+
    ```bash
-   npm start
+   pnpm run dev
    ```
-   The frontend will be accessible at `http://localhost:3000`.
+
+### HTTP Backend (apps/http-backend)
+
+1. Navigate to the HTTP backend folder:
+
+   ```bash
+   cd apps/http-backend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Start the HTTP server:
+
+   ```bash
+   pnpm run dev
+   ```
+
+### React Frontend (apps/react-frontend)
+
+1. Navigate to the React frontend folder:
+
+   ```bash
+   cd apps/react-frontend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Start the React development server:
+
+   ```bash
+   pnpm run dev
+   ```
+
+### Next.js Frontend (apps/nextjs)
+
+1. Navigate to the Next.js frontend folder:
+
+   ```bash
+   cd apps/nextjs
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Start the Next.js development server:
+
+   ```bash
+   pnpm run dev
+   ```
 
 ## Features
-- Create and join chat rooms.
-- Send messages within rooms.
-- Directly message individual users.
-- Real-time communication with WebSocket.
+
+- **Room Management**: Create, join, and manage chat rooms.
+- **Direct Messaging**: Send messages directly to other users.
+- **Real-Time Communication**: Powered by WebSockets for instant updates.
+- **Scalability**: Modular structure managed with Turborepo.
+
+## Scripts
+
+- `pnpm dev`: Run all development servers.
+- `pnpm build`: Build all applications.
+- `pnpm lint`: Lint all applications.
 
 ## Contributing
-Contributions are welcome! Feel free to submit issues or pull requests to improve Roomify.
+
+We welcome contributions! If you find a bug or have a feature request, please open an issue or submit a pull request.
 
 ## License
+
 This project is licensed under the [MIT License](LICENSE).
