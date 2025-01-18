@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { CreateUserSchema, SigninSchema } from "./Zodvalidator/User";
@@ -69,29 +69,57 @@ app.post("/signin", async (req, res) => {
   res.json({ token });
 });
 
-app.post("/v1/create-room", middleware, async (req, res) => {
-  const parseResult = Room_POST.safeParse(req.body);
+app.post(
+  "/v1/create-room",
+  middleware,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const parseResult = Room_POST.safeParse(req.body);
 
-  if (!parseResult.success) {
-    return res.status(400).json({ error: "Invalid input" });
+    if (!parseResult.success) {
+      return res.status(400).json({ error: "Invalid input" });
+    }
+
+    const { slug } = parseResult.data;
+
+    try {
+      // Example database operation using the slug
+      const newRoom = await room.create({
+        data: {
+          slug,
+          adminId: req.userId as string,
+        },
+      });
+
+      res.status(201).json(newRoom);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create room" });
+    }
   }
+);
+app.get(
+  "/messages",
+  middleware,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const { roomId, reciverId, chatId } = req.query;
 
-  const { slug } = parseResult.data;
+    if (!chatId || !reciverId || !roomId) {
+      res.status(400).json({ message: "Missing required parameters" });
+    }
 
-  try {
-    // Example database operation using the slug
-    const newRoom = await room.create({
-      data: {
-        slug,
-        adminId: req.userId as string,
-      },
-    });
-
-    res.status(201).json(newRoom);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create room" });
+    try {
+      const messages = await message.findMany({
+        where: {
+          chatId: parseInt(chatId as string),
+          receiverId: parseInt(reciverId as string),
+          senderId: parseInt(req.userId as string),
+        },
+      });
+      return res.status(200).json(messages);
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to fetch messages" });
+    }
   }
-});
+);
 
 app.listen(PORT, () => {
   console.log(`app running on http://localhost:${PORT}`);
