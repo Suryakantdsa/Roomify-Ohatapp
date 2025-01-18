@@ -28,9 +28,10 @@ cd roomify
 ```
 
 1. Navigate to the `backend` folder:
-   ```bash
-   cd backend
-   ```
+
+```bash
+cd backend
+```
 
 ### Backend Setup
 
