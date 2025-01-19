@@ -23,20 +23,22 @@
 
 import { create } from "zustand";
 
-type State = {
-  isCollapsed: Boolean;
+interface sidebarStoreInterface {
+  isCollapsed: boolean;
   activeMenuIndex: number | null;
-};
-type Actions = {
-  toggleSideBar: (state: Boolean) => void;
+  menuName: String;
+  toggleSideBar: () => void;
   setActiveMenuIndex: (index: number) => void;
-};
+  setMenuName: (name: string) => void;
+}
 
-const useSidebarStore = create<State & Actions>((set) => ({
+const useSidebarStore = create<sidebarStoreInterface>((set) => ({
   isCollapsed: false,
-  activeMenuIndex: null,
+  activeMenuIndex: 0,
+  menuName: "Home",
   toggleSideBar: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
   setActiveMenuIndex: (index) => set(() => ({ activeMenuIndex: index })),
+  setMenuName: (name) => set({ menuName: name }),
 }));
 
 export default useSidebarStore;

@@ -2,3 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 50px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f3f4f6; /* Light gray background for the track */
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #f15e76, #a75074); /* Gradient thumb */
+      border-radius: 10px;
+    }}

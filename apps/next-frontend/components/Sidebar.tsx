@@ -2,8 +2,13 @@ import { LogOutIcon, LucideHome, MessageCircle, Users } from "lucide-react";
 import useSidebarStore from "../lib/features/sidebar/sidebarStore";
 
 const Sidebar = () => {
-  const { isCollapsed, activeMenuIndex, setActiveMenuIndex, toggleSideBar } =
-    useSidebarStore();
+  const {
+    isCollapsed,
+    activeMenuIndex,
+    setActiveMenuIndex,
+    toggleSideBar,
+    setMenuName,
+  } = useSidebarStore();
 
   const menuItems = [
     { id: 0, icon: <LucideHome />, label: "Home" },
@@ -22,7 +27,7 @@ const Sidebar = () => {
         <div className="border-b">
           <div
             className="flex justify-start gap-x-4 items-center p-4 cursor-pointer"
-            onClick={() => toggleSideBar(isCollapsed)}
+            onClick={() => toggleSideBar()}
           >
             <img
               src="https://app.chitchat.gg/svgs/logo.svg"
@@ -39,7 +44,10 @@ const Sidebar = () => {
             <li key={item.id} className="relative group flex justify-center">
               <a
                 href="#"
-                onClick={() => setActiveMenuIndex(item.id)}
+                onClick={() => {
+                  setActiveMenuIndex(item.id);
+                  setMenuName(item.label);
+                }}
                 className={`flex items-center gap-3 p-3  text-gray-700 transition
 
                 ${
