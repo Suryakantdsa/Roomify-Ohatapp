@@ -1,17 +1,9 @@
-"use client";
 import { LogOutIcon, LucideHome, MessageCircle, Users } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setActiveMenuIndex,
-  toggleSidebar,
-} from "../lib/features/sidebar/SidebarSlice";
-import { RootState } from "../lib/store";
+import useSidebarStore from "../lib/features/sidebar/sidebarStore";
 
 const Sidebar = () => {
-  const dispatch = useDispatch();
-  const { isCollapsed, activeMenuIndex } = useSelector(
-    (store: RootState) => store.sidebar
-  );
+  const { isCollapsed, activeMenuIndex, setActiveMenuIndex, toggleSideBar } =
+    useSidebarStore();
 
   const menuItems = [
     { id: 0, icon: <LucideHome />, label: "Home" },
@@ -30,7 +22,7 @@ const Sidebar = () => {
         <div className="border-b">
           <div
             className="flex justify-start gap-x-4 items-center p-4 cursor-pointer"
-            onClick={() => dispatch(toggleSidebar())}
+            onClick={() => toggleSideBar(isCollapsed)}
           >
             <img
               src="https://app.chitchat.gg/svgs/logo.svg"
@@ -47,7 +39,7 @@ const Sidebar = () => {
             <li key={item.id} className="relative group flex justify-center">
               <a
                 href="#"
-                onClick={() => dispatch(setActiveMenuIndex(item.id))}
+                onClick={() => setActiveMenuIndex(item.id)}
                 className={`flex items-center gap-3 p-3  text-gray-700 transition
 
                 ${
