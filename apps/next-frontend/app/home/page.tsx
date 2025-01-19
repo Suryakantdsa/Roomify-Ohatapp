@@ -8,7 +8,6 @@ const home = () => {
       <Sidebar />
       {/* <Sidebar />
       <MiddleSidebar />
-      <Dashboard /> */}
       {/* <UserChat /> */}
     </div>
   );
