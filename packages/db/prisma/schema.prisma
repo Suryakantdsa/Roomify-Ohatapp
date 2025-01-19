@@ -13,63 +13,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Schema for WhatsApp-like chat application
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
   name      String
+  email     String   @unique
   password  String
-  avatar    String?
+  avatar    String? // Profile picture
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
-  rooms            RoomParticipant[]
-  sentMessages     Message[]         @relation("SentMessages")
-  receivedMessages Message[]         @relation("ReceivedMessages")
-  groupsOwned      Room[]            @relation("RoomOwner")
+  // Relationships
+  messages Message[] // All messages sent or received by this user
+  rooms    Room[]    @relation("RoomParticipants") // All rooms the user participates in
 }
 
 model Room {
   id        Int      @id @default(autoincrement())
-  name      String?
   isGroup   Boolean  @default(false)
+  name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  ownerId   Int? // Only for groups
 
-  // Relations
-  owner        User?             @relation("RoomOwner", fields: [ownerId], references: [id])
-  participants RoomParticipant[]
+  //relationship
+  participants User[]    @relation("RoomParticipants")
   messages     Message[]
 }
 
-model RoomParticipant {
-  id       Int      @id @default(autoincrement())
-  userId   Int
-  roomId   Int
-  joinedAt DateTime @default(now())
-  isAdmin  Boolean  @default(false)
-
-  // Relations
-  user User @relation(fields: [userId], references: [id])
-  room Room @relation(fields: [roomId], references: [id])
-
-  @@unique([userId, roomId])
-}
-
 model Message {
-  id         Int      @id @default(autoincrement())
-  content    String
-  senderId   Int
-  receiverId Int? // For direct messages
-  roomId     Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  isRead     Boolean  @default(false)
+  id        Int      @id @default(autoincrement())
+  content   String
+  senderId  Int
+  roomId    Int
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Relations
-  sender   User  @relation("SentMessages", fields: [senderId], references: [id])
-  receiver User? @relation("ReceivedMessages", fields: [receiverId], references: [id])
-  room     Room  @relation(fields: [roomId], references: [id])
+  //relationship
+  sender User @relation(fields: [senderId], references: [id])
+  room   Room @relation(fields: [roomId], references: [id])
 }
