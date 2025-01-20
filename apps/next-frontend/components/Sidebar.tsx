@@ -1,5 +1,6 @@
 import { LogOutIcon, LucideHome, MessageCircle, Users } from "lucide-react";
 import useSidebarStore from "../lib/features/sidebar/sidebarStore";
+import LogoutButton from "../app/ui/LogoutButton";
 
 const Sidebar = () => {
   const {
@@ -97,10 +98,14 @@ const Sidebar = () => {
               </div>
             )}
           </div>
-          <button className="flex items-center gap-3 mt-4 text-gray-700">
+          {/* <button
+            className="flex items-center gap-3 mt-4 text-gray-700"
+            onClick={handleLogOut}
+          >
             <LogOutIcon />
             {!isCollapsed && <span>Logout</span>}
-          </button>
+          </button> */}
+          <LogoutButton />
         </div>
       </nav>
     </aside>

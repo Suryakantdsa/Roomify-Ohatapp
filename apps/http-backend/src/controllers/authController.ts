@@ -48,6 +48,7 @@ const loginUser = async (req: Request, res: Response) => {
     if (!parsedData.success) {
       const validationError = fromZodError(parsedData.error);
       res.status(422).json(validationError.toString());
+      return;
     }
 
     const { data } = parsedData;
@@ -82,8 +83,14 @@ const loginUser = async (req: Request, res: Response) => {
 };
 
 const logoutUser = async (req: Request, res: Response) => {
-  clearCookies(res);
-  res.status(200).json({ message: "user logged out" });
+  try {
+    clearCookies(res);
+    res.status(200).json({ message: "user logged out" });
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 export { signupUser, loginUser, logoutUser };

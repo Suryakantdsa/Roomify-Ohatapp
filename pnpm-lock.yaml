@@ -109,6 +109,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@repo/zod':
+        specifier: workspace:*
+        version: link:../../packages/zod
       '@types/node':
         specifier: ^20
         version: 20.17.6

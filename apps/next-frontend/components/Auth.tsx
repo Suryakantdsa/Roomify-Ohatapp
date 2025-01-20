@@ -1,14 +1,83 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { InstagramIcon, LinkedinIcon, TwitterIcon } from "lucide-react";
 import Avatar from "./Avatar";
 import Link from "next/link";
+import useSignUpStore from "../lib/features/userAuth/signUpStore";
+import { loginUserSchema, signupUserSchema } from "@repo/zod/src/userSchema";
+import { useRouter } from "next/navigation";
 
 const Auth = ({ mode = "signup" }) => {
   // Mode-based settings
+  const router = useRouter();
+
   const isSignUp = mode === "signup";
   const avatarSeeds = ["user1", "user2", "johndoe", "surya", "sashi"];
   const [selectedSeed, setSelectedSeed] = useState<string | null>(null);
+
+  const {
+    email,
+    name,
+    password,
+    avatar,
+    setAvatar,
+    setEmail,
+    setName,
+    setPassword,
+  } = useSignUpStore();
+
+  const baseUrl = "http://localhost:8001/api/v1";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (isSignUp) {
+        const validatedData = signupUserSchema.safeParse({
+          name,
+          email,
+          password,
+          avatar,
+        });
+        const response = await fetch(`${baseUrl}/signup `, {
+          method: "POST",
+          headers: {
+            "content-Type": "application/json",
+          },
+          body: JSON.stringify(validatedData.data),
+        }).catch((e) => {
+          console.log(e.Messages);
+        });
+
+        console.log(response);
+        router.push("/signin");
+      } else {
+        const validatedData = loginUserSchema.safeParse({
+          email,
+          password,
+        });
+        console.log(validatedData);
+        const response = await fetch(`${baseUrl}/login`, {
+          method: "POST",
+          headers: {
+            "content-Type": "application/json",
+          },
+          body: JSON.stringify(validatedData.data),
+        })
+          .then(async (res) => {
+            const data = await res.json();
+            console.log(data);
+            localStorage.setItem("accessToken", data.accessToken);
+            router.push("/home");
+          })
+          .catch((e) => {
+            console.log(e.Messages);
+          });
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
 
   const handleAvatarSelect = (seed: string) => {
     setSelectedSeed(seed); // Update the selected avatar URL
@@ -41,7 +110,10 @@ const Auth = ({ mode = "signup" }) => {
 
       {/* Form Section */}
       <div className="mt-4 flex flex-col items-center">
-        <form className="shadow-md rounded-lg p-6 w-96 bg-slate-200">
+        <form
+          onSubmit={handleSubmit}
+          className="shadow-md rounded-lg p-6 w-96 bg-slate-200"
+        >
           <h2 className="text-2xl font-semibold text-center mb-4">
             {isSignUp ? "Join Roomify" : "Sign In to Roomify"}
           </h2>
@@ -54,6 +126,8 @@ const Auth = ({ mode = "signup" }) => {
               <input
                 id="name"
                 type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-700"
                 required
@@ -68,6 +142,8 @@ const Auth = ({ mode = "signup" }) => {
             <input
               id="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-700"
               required
@@ -98,6 +174,8 @@ const Auth = ({ mode = "signup" }) => {
             <input
               id="password"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-700"
               required
