@@ -5,6 +5,7 @@ import authRouter from "./routes/authRouter";
 import userRouter from "./routes/userRouter";
 import { errorHandler } from "./middlewares/errorMiddleware";
 import { AuthenticateJWT } from "./middlewares/authMiddleware";
+import router from "./routes";
 
 interface UserBasicInfo {
   id: number;
@@ -31,8 +32,8 @@ app.use(
   })
 );
 
-app.use(authRouter);
-app.use("/user", AuthenticateJWT, userRouter);
+app.use("/api/v1", router);
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {

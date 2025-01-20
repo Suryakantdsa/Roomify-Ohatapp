@@ -1,7 +1,14 @@
 import express, { Router } from "express";
-import { getChats } from "../controllers/chatsController";
+import {
+  getChatMessages,
+  getChats,
+  sendMessage,
+} from "../controllers/chatsController";
+import { AuthenticateJWT } from "../middlewares/authMiddleware";
 
 const router: Router = express.Router();
-router.get("/chats", getChats);
+router.get("/chats", AuthenticateJWT, getChats);
+router.get("/chats-messages", AuthenticateJWT, getChatMessages);
+router.post("/send-message", AuthenticateJWT, sendMessage);
 
-export { router };
+export default router;

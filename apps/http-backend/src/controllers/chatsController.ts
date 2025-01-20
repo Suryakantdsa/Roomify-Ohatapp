@@ -3,58 +3,6 @@ import { Request, Response } from "express";
 import { createMessageSchema } from "@repo/zod/src/MessageSchema";
 import { fromError } from "@repo/zod/node_modules/zod-validation-error";
 
-// const getChats = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.user?.id;
-//     const chats = await prismaClient.room.findMany({
-//       where: {
-//         participants: {
-//           some: { id: userId },
-//         },
-//       },
-//       include: {
-//         messages: {
-//           take: 1,
-//           orderBy: {
-//             createdAt: "desc",
-//           },
-//         },
-//         participants: {
-//           where: { NOT: { id: userId } },
-//           select: {
-//             id: true,
-//             name: true,
-//             avatar: true,
-//           },
-//         },
-//       },
-//     });
-//     chats.map((chat) => {
-//       if (chat.isGroup) {
-//         res.status(201).json({
-//           id: chat.id,
-//           name: chat.name,
-//           avatar: chat.avatar || "/default.jpeg",
-//           lastMessage: chat.message[0]?.content || "no message yet",
-//           lastTime: chat.message[0]?.createdAt || null,
-//         });
-//       } else {
-//         res.status(201).json({
-//           id: chat.id,
-//           name: chat.participants[0]?.name || "Unknown user",
-//           avatar: chat.participants[0]?.avatar || "/default.jpeg",
-//           lastMessage: chat.message[0]?.content || "no message yet",
-//           lastTime: chat.message[0]?.createdAt || null,
-//         });
-//       }
-//     });
-//   } catch (error: any) {
-//     res
-//       .status(500)
-//       .json({ message: "internal server error: " + error.message });
-//   }
-// };
-
 const getChats = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -95,7 +43,7 @@ const getChats = async (req: Request, res: Response) => {
         return {
           id: chat.id,
           name: chat.name || "Group Chat",
-          avatar: "/default.jpeg",
+          avatar: chat.participants[0]?.avatar || "/default.jpeg",
           lastMessage,
           lastTime,
         };
@@ -178,6 +126,7 @@ const getChatMessages = async (req: Request, res: Response) => {
     });
   }
 };
+
 const sendMessage = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -222,12 +171,12 @@ const sendMessage = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       message: "Message sent successfully.",
       data: sentMessage,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    res.status(500).json({
       message: "Internal server error: " + error.message,
     });
   }

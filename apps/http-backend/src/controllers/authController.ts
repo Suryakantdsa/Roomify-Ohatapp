@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import { prismaClient } from "@repo/db/client";
 import { loginUserSchema, signupUserSchema } from "@repo/zod/src/userSchema";
 import { fromZodError } from "@repo/zod/node_modules/zod-validation-error";
-import { comparePassword, generateToken, hashPassword } from "../utils/auth";
+import {
+  comparePassword,
+  generateToken,
+  hashPassword,
+  clearCookies,
+} from "../utils/auth";
 import { AuthenticationError } from "../middlewares/errorMiddleware";
 
 const signinUser = async (req: Request, res: Response) => {
@@ -74,4 +79,9 @@ const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export { signinUser, loginUser };
+const logoutUser = async (req: Request, res: Response) => {
+  clearCookies(res);
+  res.status(200).json({ message: "user logged out" });
+};
+
+export { signinUser, loginUser, logoutUser };

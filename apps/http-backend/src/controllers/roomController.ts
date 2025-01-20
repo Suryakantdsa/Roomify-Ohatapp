@@ -24,3 +24,5 @@ const createRoom = async (req: Request, res: Response) => {
     res.status(500).json("Internal server error " + error.message);
   }
 };
+
+export { createRoom };
