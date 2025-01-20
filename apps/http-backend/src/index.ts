@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter";
 import userRouter from "./routes/userRouter";
 import { errorHandler } from "./middlewares/errorMiddleware";
-import { authenticate } from "./middlewares/authMiddleware";
+import { AuthenticateJWT } from "./middlewares/authMiddleware";
 
 interface UserBasicInfo {
   id: number;
@@ -32,7 +32,7 @@ app.use(
 );
 
 app.use(authRouter);
-app.use("/user", authenticate, userRouter);
+app.use("/user", AuthenticateJWT, userRouter);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

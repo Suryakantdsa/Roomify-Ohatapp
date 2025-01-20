@@ -60,7 +60,7 @@ const getChats = async (req: Request, res: Response) => {
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized. Please log in." });
+      res.status(401).json({ message: "Unauthorized. Please log in." });
     }
 
     const chats = await prismaClient.room.findMany({
@@ -95,7 +95,7 @@ const getChats = async (req: Request, res: Response) => {
         return {
           id: chat.id,
           name: chat.name || "Group Chat",
-          avatar: chat.avatar || "/default.jpeg",
+          avatar: "/default.jpeg",
           lastMessage,
           lastTime,
         };
@@ -111,9 +111,9 @@ const getChats = async (req: Request, res: Response) => {
       }
     });
 
-    return res.status(200).json(response);
+    res.status(200).json(response);
   } catch (error: any) {
-    return res
+    res
       .status(500)
       .json({ message: "Internal server error: " + error.message });
   }
@@ -127,7 +127,7 @@ const getChatMessages = async (req: Request, res: Response) => {
     const pageSize = parseInt(req.query.pageSize as string) || 20;
 
     if (!roomId) {
-      return res.status(400).json({
+      res.status(400).json({
         message: "roomId is required",
       });
     }
@@ -149,7 +149,7 @@ const getChatMessages = async (req: Request, res: Response) => {
       take: pageSize,
       include: {
         sender: { select: { id: true, name: true, avatar: true } },
-        receiver: { select: { id: true, name: true, avatar: true } },
+        // : { select: { id: true, name: true, avatar: true } },
       },
     });
 
@@ -164,7 +164,7 @@ const getChatMessages = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       total: totalMessages,
       skip: (page - 1) * pageSize,
       limit: pageSize,
@@ -173,7 +173,7 @@ const getChatMessages = async (req: Request, res: Response) => {
       data: messages,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    res.status(500).json({
       message: "Internal server error: " + error.message,
     });
   }
@@ -183,16 +183,18 @@ const sendMessage = async (req: Request, res: Response) => {
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized. Please log in." });
+      res.status(401).json({ message: "Unauthorized. Please log in." });
+      return;
     }
 
     const parsedData = createMessageSchema.safeParse(req.body);
     if (!parsedData.success) {
       const validationError = fromError(parsedData.error);
-      return res.status(400).json({
+      res.status(400).json({
         message: "Validation error",
         details: validationError.toString(),
       });
+      return;
     }
 
     const { roomId, content } = parsedData.data;
@@ -207,7 +209,7 @@ const sendMessage = async (req: Request, res: Response) => {
     });
 
     if (!isParticipant) {
-      return res.status(403).json({
+      res.status(403).json({
         message: "You are not authorized to send messages to this room.",
       });
     }

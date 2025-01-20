@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import asyncHandler from "express-async-handler";
 import { AuthenticationError } from "./errorMiddleware";
 import { prismaClient } from "@repo/db/client";
 
-const authenticate = asyncHandler(
+const AuthenticateJWT: RequestHandler = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       let token =
@@ -41,4 +41,4 @@ const authenticate = asyncHandler(
   }
 );
 
-export { authenticate };
+export { AuthenticateJWT };
