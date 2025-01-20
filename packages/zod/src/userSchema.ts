@@ -21,7 +21,7 @@ export const signupUserSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   password: z.string(),
-  avatar: z.string(),
+  avatar: z.string().optional(),
 });
 
 export const loginUserSchema = z.object({

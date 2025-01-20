@@ -8,5 +8,8 @@ export const createRoomSchema = z.object({
     .optional(),
   isGroup: z.boolean().default(false),
 });
+export const joinRoomSchema = z.object({
+  roomId: z.number(),
+});
 
 export type Room_POST = z.infer<typeof createRoomSchema>;

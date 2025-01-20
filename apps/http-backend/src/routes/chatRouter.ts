@@ -8,7 +8,7 @@ import { AuthenticateJWT } from "../middlewares/authMiddleware";
 
 const router: Router = express.Router();
 router.get("/chats", AuthenticateJWT, getChats);
-router.get("/chats-messages", AuthenticateJWT, getChatMessages);
+router.get("/chat-messages/:roomId", AuthenticateJWT, getChatMessages);
 router.post("/send-message", AuthenticateJWT, sendMessage);
 
 export default router;

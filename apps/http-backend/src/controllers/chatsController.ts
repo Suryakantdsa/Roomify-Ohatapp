@@ -9,6 +9,7 @@ const getChats = async (req: Request, res: Response) => {
 
     if (!userId) {
       res.status(401).json({ message: "Unauthorized. Please log in." });
+      return;
     }
 
     const chats = await prismaClient.room.findMany({
@@ -19,6 +20,7 @@ const getChats = async (req: Request, res: Response) => {
       },
       include: {
         messages: {
+          where: { NOT: { id: userId } },
           take: 1,
           orderBy: {
             createdAt: "desc",
@@ -43,7 +45,7 @@ const getChats = async (req: Request, res: Response) => {
         return {
           id: chat.id,
           name: chat.name || "Group Chat",
-          avatar: chat.participants[0]?.avatar || "/default.jpeg",
+          avatar: "/group-default.jpeg",
           lastMessage,
           lastTime,
         };
@@ -51,6 +53,8 @@ const getChats = async (req: Request, res: Response) => {
         const participant = chat.participants[0];
         return {
           id: chat.id,
+          sendId: userId,
+          reciverId: participant?.id,
           name: participant?.name || "Unknown User",
           avatar: participant?.avatar || "/default.jpeg",
           lastMessage,
@@ -78,6 +82,7 @@ const getChatMessages = async (req: Request, res: Response) => {
       res.status(400).json({
         message: "roomId is required",
       });
+      return;
     }
 
     const totalMessages = await prismaClient.message.count({
@@ -146,21 +151,46 @@ const sendMessage = async (req: Request, res: Response) => {
       return;
     }
 
-    const { roomId, content } = parsedData.data;
+    const { roomId, content, reciverId } = parsedData.data;
 
-    const isParticipant = await prismaClient.room.findFirst({
+    const roomDetails = await prismaClient.room.findFirst({
       where: {
         id: roomId,
-        participants: {
-          some: { id: userId },
-        },
+      },
+      select: {
+        id: true,
+        participants: { select: { id: true } },
+        isGroup: true,
       },
     });
+    if (!roomDetails) {
+      res.status(404).json({
+        message: "Room not found",
+      });
+      return;
+    }
 
-    if (!isParticipant) {
-      res.status(403).json({
+    const participantIds = roomDetails.participants.map((p) => p.id);
+
+    if (roomDetails.isGroup && !participantIds.includes(userId)) {
+      res.status(400).json({
         message: "You are not authorized to send messages to this room.",
       });
+      return;
+    }
+    if (reciverId && !participantIds.includes(reciverId)) {
+      if (!roomDetails?.isGroup) {
+        await prismaClient.room.update({
+          where: {
+            id: roomId,
+          },
+          data: {
+            participants: {
+              connect: [{ id: userId }, { id: reciverId }],
+            },
+          },
+        });
+      }
     }
 
     const sentMessage = await prismaClient.message.create({

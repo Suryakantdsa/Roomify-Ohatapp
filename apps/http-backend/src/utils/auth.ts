@@ -8,13 +8,11 @@ const hashPassword = async (password: string): Promise<string> => {
   return hashedPassword;
 };
 const comparePassword = async (enterPassword: string, passowrd: string) => {
-  const salt = await bcrypt.genSalt(10);
-  const enterHashPassword = await bcrypt.hash(enterPassword, salt);
-  return await bcrypt.compare(enterHashPassword, passowrd);
+  return await bcrypt.compare(enterPassword, passowrd);
 };
 
 const generateToken = (res: Response, userId: number) => {
-  const jwtSecret = process.env.JWT_SECRET || "";
+  const jwtSecret = process.env.JWT_SECRET || "surya@1qee";
   const token = jwt.sign(
     {
       userId,

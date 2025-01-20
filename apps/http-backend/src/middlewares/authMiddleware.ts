@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import e, { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import asyncHandler from "express-async-handler";
@@ -14,7 +14,7 @@ const AuthenticateJWT: RequestHandler = asyncHandler(
       if (!token) {
         throw new AuthenticationError("token not found");
       }
-      const jwtSecret = process.env.JWT_SECRET || "";
+      const jwtSecret = process.env.JWT_SECRET || "surya@1qee";
       const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
       if (!decoded || !decoded.userId) {
         throw new AuthenticationError("userId not found");
@@ -35,8 +35,8 @@ const AuthenticateJWT: RequestHandler = asyncHandler(
       }
       req.user = user;
       next();
-    } catch (error) {
-      throw new AuthenticationError("Invalid token");
+    } catch (error: any) {
+      throw new AuthenticationError(error.message);
     }
   }
 );

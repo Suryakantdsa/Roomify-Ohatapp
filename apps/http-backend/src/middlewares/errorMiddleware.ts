@@ -8,6 +8,7 @@ const errorHandler = (
   console.error(err.stack);
 
   if (err instanceof AuthenticationError) {
+    console.log("herre");
     res.status(401).json({ message: `Unauthorized: ${err.message}` });
   } else {
     res.status(500).json({
@@ -18,7 +19,7 @@ const errorHandler = (
 
 class AuthenticationError extends Error {
   constructor(message: string) {
-    super();
+    super(message);
     this.name = "AuthenticationError";
   }
 }

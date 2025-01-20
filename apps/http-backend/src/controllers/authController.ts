@@ -8,9 +8,8 @@ import {
   hashPassword,
   clearCookies,
 } from "../utils/auth";
-import { AuthenticationError } from "../middlewares/errorMiddleware";
 
-const signinUser = async (req: Request, res: Response) => {
+const signupUser = async (req: Request, res: Response) => {
   try {
     const parsedData = signupUserSchema.safeParse(req.body);
 
@@ -55,9 +54,9 @@ const loginUser = async (req: Request, res: Response) => {
     const userDetails = await prismaClient.user.findFirst({
       where: {
         email: data?.email,
-        password: data?.password,
       },
     });
+
     if (
       userDetails &&
       data?.password &&
@@ -74,8 +73,11 @@ const loginUser = async (req: Request, res: Response) => {
     } else {
       res.status(401).json({ message: "User not found / password incorrect" });
     }
-  } catch (error) {
-    throw new AuthenticationError("Login failed");
+  } catch (error: any) {
+    // throw new AuthenticationError(error.message);
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
@@ -84,4 +86,4 @@ const logoutUser = async (req: Request, res: Response) => {
   res.status(200).json({ message: "user logged out" });
 };
 
-export { signinUser, loginUser, logoutUser };
+export { signupUser, loginUser, logoutUser };
