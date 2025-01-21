@@ -16,6 +16,8 @@ const Sidebar = () => {
     { id: 1, icon: <MessageCircle />, label: "Messages" },
     { id: 2, icon: <Users />, label: "Rooms" },
   ];
+  let user = localStorage.getItem("user") as any;
+  user = JSON.parse(user);
 
   return (
     <aside
@@ -93,8 +95,8 @@ const Sidebar = () => {
             </div>
             {!isCollapsed && (
               <div>
-                <h4 className="font-semibold">John Doe</h4>
-                <span className="text-sm text-gray-500">johndoe@gmail.com</span>
+                <h4 className="font-semibold">{user?.name}</h4>
+                <span className="text-sm text-gray-500">{user?.email}</span>
               </div>
             )}
           </div>

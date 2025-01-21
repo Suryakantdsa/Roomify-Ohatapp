@@ -7,7 +7,10 @@ const getUser = async (req: Request, res: Response) => {
     const userId = req?.user?.id;
 
     if (!userId) {
-      throw new AuthenticationError("Invaild acccessToken");
+      res.status(401).json({
+        message: "invalid accessToken",
+      });
+      return;
     }
 
     const userDetails = await prismaClient.user.findFirst({
@@ -26,4 +29,19 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
-export { getUser };
+const getAllUser = async (req: Request, res: Response) => {
+  try {
+    const allUserDetails = await prismaClient.user.findMany({
+      omit: {
+        password: true,
+      },
+    });
+    res.status(201).json(allUserDetails);
+  } catch (error) {
+    res.status(404).json({
+      message: "user not found",
+    });
+  }
+};
+
+export { getUser, getAllUser };

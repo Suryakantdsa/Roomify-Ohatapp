@@ -8,9 +8,11 @@ import {
 // import { useState } from "react";
 import Chats from "../app/ui/Chats";
 import SearchBar from "../app/ui/SearchBar";
+import addUserForChatStore from "../lib/features/chat/addUserforChat";
 
 export default function MiddleSidebar() {
   // const [isSearching, SetSearching] = useState(true);
+  const { toggleAddUserButton } = addUserForChatStore();
 
   return (
     <aside
@@ -20,7 +22,10 @@ export default function MiddleSidebar() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Chats</h1>
           <div className="flex justify-between items-center w-14">
-            <MessageCirclePlus size={20} />
+            <MessageCirclePlus
+              size={20}
+              onClick={() => toggleAddUserButton()}
+            />
             <EllipsisVertical size={20} />
           </div>
         </div>

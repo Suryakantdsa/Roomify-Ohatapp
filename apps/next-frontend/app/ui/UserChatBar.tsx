@@ -1,14 +1,27 @@
 import React, { useState } from "react";
 import { Send, Smile } from "lucide-react";
+import messageStore from "../../lib/features/chat/mesagesStore";
+import sendMessageStore from "../../lib/features/chat/sendMessage";
 
 const UserChatBar = () => {
   const [message, setMessage] = useState("");
+  const { messages } = messageStore();
+  const { fetchsendMessagesData } = sendMessageStore();
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (e: any) => {
     if (message.trim() !== "") {
-      //alert(message);
+      alert(message);
       console.log("Message sent:", message); // Replace with actual send logic
-      setMessage(""); // Clear the input after sending
+      setMessage(e.target.value); // Clear the input after sending
+      let body;
+      if (messages) {
+        body = {
+          content: message,
+          roomId: messages.data?.[0]?.roomId,
+        };
+      } else {
+      }
+      fetchsendMessagesData({ content: message });
     }
   };
 
@@ -22,7 +35,7 @@ const UserChatBar = () => {
         placeholder="Type a message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+        onKeyDown={(e) => e.key === "Enter" && handleSendMessage(e)}
         className="flex-1 p-2 bg-white border border-gray-300 rounded-md outline-none"
       />
       <button

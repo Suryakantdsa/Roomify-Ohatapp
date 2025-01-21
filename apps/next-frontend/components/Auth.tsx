@@ -28,7 +28,7 @@ const Auth = ({ mode = "signup" }) => {
     setPassword,
   } = useSignUpStore();
 
-  const baseUrl = "http://localhost:8001/api/v1";
+  const baseUrl = "http://localhost:8002/api/v1";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +72,7 @@ const Auth = ({ mode = "signup" }) => {
             const data = await res.json();
             console.log(data);
             localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("user", JSON.stringify(data.user));
             router.push("/home");
             setLoading(false);
           })

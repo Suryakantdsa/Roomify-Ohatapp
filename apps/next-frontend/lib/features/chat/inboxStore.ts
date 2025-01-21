@@ -34,7 +34,11 @@ const inboxStore = create<inboxStoreInterface>((set) => ({
       });
       set({ chatData: response.data, isInboxLoading: false, error: null });
     } catch (error: any) {
-      set({ error: error.message, isInboxLoading: false });
+      set({
+        error:
+          error.response?.data?.message || error.message || "An error occurred",
+        isInboxLoading: false,
+      });
     }
   },
 }));

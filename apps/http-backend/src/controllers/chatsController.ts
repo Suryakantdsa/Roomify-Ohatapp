@@ -37,6 +37,8 @@ const getChats = async (req: Request, res: Response) => {
       },
     });
 
+    // console.log(chats);
+
     const response = chats.map((chat) => {
       const lastMessage = chat.messages[0]?.content || "No messages yet";
       const lastTime = chat.messages[0]?.createdAt || null;
@@ -54,7 +56,6 @@ const getChats = async (req: Request, res: Response) => {
         const participant = chat.participants[0];
         return {
           id: chat.id,
-          sendId: userId,
           reciverId: participant?.id,
           isGroup: chat.isGroup,
           name: participant?.name || "Unknown User",
@@ -103,6 +104,7 @@ const getChatMessages = async (req: Request, res: Response) => {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
+        room: { select: { name: true } },
         sender: { select: { id: true, name: true, avatar: true } },
         // : { select: { id: true, name: true, avatar: true } },
       },
@@ -154,17 +156,32 @@ const sendMessage = async (req: Request, res: Response) => {
     }
 
     const { roomId, content, reciverId } = parsedData.data;
-
-    const roomDetails = await prismaClient.room.findFirst({
-      where: {
-        id: roomId,
-      },
-      select: {
-        id: true,
-        participants: { select: { id: true } },
-        isGroup: true,
-      },
-    });
+    let roomDetails;
+    if (!roomId && reciverId) {
+      roomDetails = await prismaClient.room.create({
+        data: {
+          participants: {
+            connect: [{ id: reciverId }, { id: userId }],
+          },
+        },
+        select: {
+          id: true,
+          participants: { select: { id: true } },
+          isGroup: true,
+        },
+      });
+    } else {
+      roomDetails = await prismaClient.room.findFirst({
+        where: {
+          id: roomId,
+        },
+        select: {
+          id: true,
+          participants: { select: { id: true } },
+          isGroup: true,
+        },
+      });
+    }
     if (!roomDetails) {
       res.status(404).json({
         message: "Room not found",
@@ -173,6 +190,13 @@ const sendMessage = async (req: Request, res: Response) => {
     }
 
     const participantIds = roomDetails.participants.map((p) => p.id);
+    console.log(participantIds);
+    if (!participantIds.includes(userId)) {
+      res.status(400).json({
+        message: "cann't send",
+      });
+      return;
+    }
 
     if (roomDetails.isGroup && !participantIds.includes(userId)) {
       res.status(400).json({
@@ -198,7 +222,7 @@ const sendMessage = async (req: Request, res: Response) => {
     const sentMessage = await prismaClient.message.create({
       data: {
         senderId: userId,
-        roomId,
+        roomId: roomDetails.id,
         content,
       },
     });

@@ -1,3 +1,6 @@
+import messageStore from "../../lib/features/chat/mesagesStore";
+import { formatDate } from "../utils/formatDate";
+
 const UserChatArea = () => {
   // const messages = [
   //   { id: 1, sender: "User", text: "Hello!", time: "10:00 AM" },
@@ -28,32 +31,46 @@ const UserChatArea = () => {
   //   },
   //   { id: 4, sender: "You", text: "Great to hear that!", time: "10:03 AM" },
   // ];
+  const { messages } = messageStore();
+  // const user = localStorage.getItem("user");
+  // if(user && user.id){
+  if (!messages) {
+    return null;
+  }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-gray-50 custom-scrollbar">
-      <div className="space-y-4">
-        {/* {messages.map((message) => (
+    <div className="flex h-full overflow-y-auto p-4 bg-gray-50 custom-scrollbar flex-col-reverse">
+      <div className="flex flex-col space-y-4 ">
+        {/* Change to flex-col */}
+        {messages?.data.map((message) => (
           <div
             key={message.id + "slnklbolnN"}
             className={`flex ${
-              message.sender === "You" ? "justify-end" : "justify-start"
+              message?.senderId === 3 ? "justify-end" : "justify-start"
             }`}
           >
             <div
               className={`max-w-xs px-4 py-2 rounded-lg ${
-                message.sender === "You"
+                message.senderId === 3
                   ? "bg-[#6C61C6] text-white"
                   : "bg-gray-200"
               }`}
             >
-              <p>{message.text}</p>
-              <span className="text-xs text-gray-900">{message.time}</span>
+              <p>{message.content}</p>
+              <span className="text-xs text-gray-900">
+                {formatDate(message?.createdAt.toString())}
+              </span>
             </div>
           </div>
-        ))} */}
+        ))}
+        {/* Invisible div to scroll into view */}
       </div>
     </div>
   );
 };
+
+// export default ChatMessages;
+
+// };
 
 export default UserChatArea;

@@ -8,10 +8,13 @@ import UserChat from "../../components/UserChat";
 import HomeCompo from "../../components/HomeCompo";
 import userAuthStore from "../../lib/features/userAuth/userAuthStore";
 import Loading from "../../components/Loading";
+import addUserForChatStore from "../../lib/features/chat/addUserforChat";
+import AllUser from "../../components/AllUser";
 
 const home = () => {
   const { menuName } = useSidebarStore();
   const { loading } = userAuthStore();
+  const { isAddUserButtonClicked } = addUserForChatStore();
   if (loading) {
     return <Loading />;
   }
@@ -19,7 +22,7 @@ const home = () => {
   return (
     <div className="w-screen flex font-mono ">
       <Sidebar />
-      <MiddleSidebar />
+      {isAddUserButtonClicked ? <AllUser /> : <MiddleSidebar />}
       {menuName === "Rooms" ? (
         <JoinRoom />
       ) : menuName === "Home" ? (
