@@ -6,6 +6,7 @@ import Link from "next/link";
 import useSignUpStore from "../lib/features/userAuth/signUpStore";
 import { loginUserSchema, signupUserSchema } from "@repo/zod/src/userSchema";
 import { useRouter } from "next/navigation";
+import userAuthStore from "../lib/features/userAuth/userAuthStore";
 
 const Auth = ({ mode = "signup" }) => {
   // Mode-based settings
@@ -14,6 +15,7 @@ const Auth = ({ mode = "signup" }) => {
   const isSignUp = mode === "signup";
   const avatarSeeds = ["user1", "user2", "johndoe", "surya", "sashi"];
   const [selectedSeed, setSelectedSeed] = useState<string | null>(null);
+  const { setLoading } = userAuthStore();
 
   const {
     email,
@@ -38,6 +40,7 @@ const Auth = ({ mode = "signup" }) => {
           password,
           avatar,
         });
+
         const response = await fetch(`${baseUrl}/signup `, {
           method: "POST",
           headers: {
@@ -48,7 +51,8 @@ const Auth = ({ mode = "signup" }) => {
           console.log(e.Messages);
         });
 
-        console.log(response);
+        // console.log(response);
+
         router.push("/signin");
       } else {
         const validatedData = loginUserSchema.safeParse({
@@ -56,6 +60,7 @@ const Auth = ({ mode = "signup" }) => {
           password,
         });
         console.log(validatedData);
+        setLoading(true);
         const response = await fetch(`${baseUrl}/login`, {
           method: "POST",
           headers: {
@@ -68,6 +73,7 @@ const Auth = ({ mode = "signup" }) => {
             console.log(data);
             localStorage.setItem("accessToken", data.accessToken);
             router.push("/home");
+            setLoading(false);
           })
           .catch((e) => {
             console.log(e.Messages);
