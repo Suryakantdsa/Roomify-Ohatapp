@@ -23,7 +23,7 @@ declare global {
 }
 
 const app = express();
-const PORT = process.env.PORT || "8001";
+const PORT = process.env.PORT || "8002";
 app.use(express.json());
 app.use(cookieParser());
 app.use(

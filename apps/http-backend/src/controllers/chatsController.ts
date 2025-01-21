@@ -46,6 +46,7 @@ const getChats = async (req: Request, res: Response) => {
           id: chat.id,
           name: chat.name || "Group Chat",
           avatar: "/group-default.jpeg",
+          isGroup: chat.isGroup,
           lastMessage,
           lastTime,
         };
@@ -55,6 +56,7 @@ const getChats = async (req: Request, res: Response) => {
           id: chat.id,
           sendId: userId,
           reciverId: participant?.id,
+          isGroup: chat.isGroup,
           name: participant?.name || "Unknown User",
           avatar: participant?.avatar || "/default.jpeg",
           lastMessage,

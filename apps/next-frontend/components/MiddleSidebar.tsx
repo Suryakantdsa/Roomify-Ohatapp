@@ -1,14 +1,16 @@
+"use client";
 import {
   ArrowDown,
   EllipsisVertical,
   MessageCirclePlus,
   Search,
 } from "lucide-react";
-import { useState } from "react";
+// import { useState } from "react";
 import Chats from "../app/ui/Chats";
+import SearchBar from "../app/ui/SearchBar";
 
-const MiddleSidebar = () => {
-  const [isSearching, SetSearching] = useState(true);
+export default function MiddleSidebar() {
+  // const [isSearching, SetSearching] = useState(true);
 
   return (
     <aside
@@ -24,7 +26,7 @@ const MiddleSidebar = () => {
         </div>
 
         {/* search bar */}
-        <div className="flex items-center px-4 gap-x-6 rounded-md bg-gray-200 w-full h-12 mt-6 mb-2 ">
+        {/* <div className="flex items-center px-4 gap-x-6 rounded-md bg-gray-200 w-full h-12 mt-6 mb-2 ">
           {isSearching ? (
             <Search size={15} />
           ) : (
@@ -49,7 +51,8 @@ const MiddleSidebar = () => {
               SetSearching(false);
             }}
           />
-        </div>
+        </div> */}
+        <SearchBar />
 
         {/* chat user */}
         {/* <div className="h-screen overflow-y-auto custom-scrollbar ">
@@ -70,6 +73,4 @@ const MiddleSidebar = () => {
       </nav>
     </aside>
   );
-};
-
-export default MiddleSidebar;
+}
