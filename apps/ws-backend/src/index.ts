@@ -247,7 +247,7 @@ wss.on("connection", function connection(socket, request) {
         socket.send(JSON.stringify(response));
       } else if (parseBody.event === Event.JOIN_ROOM) {
         const { event, payload } = parseBody as JoinRoomRequest;
-
+        console.log("parseBody joinrooom", parseBody);
         const { roomId } = payload;
         if (!roomId) {
           socket.send(
@@ -259,7 +259,7 @@ wss.on("connection", function connection(socket, request) {
         }
 
         const userDetails = allUser.find((user) => user.socket === socket);
-
+        console.log("userDetails", userDetails);
         if (!userDetails) {
           socket.send(
             JSON.stringify({
@@ -311,6 +311,8 @@ wss.on("connection", function connection(socket, request) {
           user.roomId?.includes(roomId)
         );
 
+        console.log(userDetails.roomId);
+        console.log(userDetails.roomId?.includes(roomId));
         roomUser.forEach((user) => {
           user.socket?.send(
             JSON.stringify({
@@ -350,7 +352,7 @@ wss.on("connection", function connection(socket, request) {
         //   );
         //   return;
         // }
-        await prismaClient.message.create({
+        const mesaage = await prismaClient.message.create({
           data: {
             roomId: Number(roomId),
             content: message,
@@ -367,14 +369,15 @@ wss.on("connection", function connection(socket, request) {
           user.socket?.send(
             JSON.stringify({
               event: "message",
-              payload: {
-                roomId,
-                senderId: userId,
-                content: message,
-                senderName: userDetails.name,
-                senderAvatar: userDetails.avatar,
-                timestamp: new Date(),
-              },
+              payload: mesaage,
+              // payload: {
+              //   roomId,
+              //   senderId: userId,
+              //   content: message,
+              //   senderName: userDetails.name,
+              //   senderAvatar: userDetails.avatar,
+              //   createdAt: new Date(),
+              // },
             })
           );
         });

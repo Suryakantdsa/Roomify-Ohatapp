@@ -1,64 +1,64 @@
 "use client";
 import { useEffect } from "react";
-import addUserForChatStore, {
-  userBody,
-} from "../../lib/features/chat/addUserforChat";
+import addUserForChatStore from "../../lib/features/chat/addUserforChat";
 import messageStore from "../../lib/features/chat/mesagesStore";
 import { formatDate } from "../utils/formatDate";
 import socketStore from "../../lib/features/socket/socketStore";
 
 const UserChatArea = () => {
-  const { messagesData } = messageStore();
-  const { setUserForChat, user } = addUserForChatStore();
-
+  const { messagesData, setMessages } = messageStore();
+  const { user } = addUserForChatStore();
   const { setSocket, socket } = socketStore();
-  let userInfo: any = localStorage.getItem("user");
-  let tokenVal: any = localStorage.getItem("accessToken");
-  let WS_URL = "ws://localhost:8080";
-  if (userInfo) {
-    userInfo = JSON.parse(userInfo);
-  }
 
-  // console.log(userInfo);
-  // if(user && user.id){
+  let userInfo = JSON.parse(localStorage.getItem("user") || "{}");
+  let tokenVal = localStorage.getItem("accessToken");
+  const WS_URL = "ws://localhost:8080";
 
   useEffect(() => {
-    // if (!user?.id) {
-    //   return;
-    // }
-    console.log("njnkonk");
     const ws = new WebSocket(`${WS_URL}?token=${tokenVal}`);
     ws.onopen = () => {
       setSocket(ws);
-      const data = JSON.stringify({
-        event: "join_room",
-        payload: {
-          roomid: user?.id,
-        },
-      });
-      console.log("joining room id:", data);
-      ws.send(data);
+      ws.send(
+        JSON.stringify({
+          event: "join_room",
+          payload: { roomId: user?.id },
+        })
+      );
     };
+
+    // ws.onerror = (error) => console?.error("WebSocket error:", error);
+    ws.onclose = () => console.warn("WebSocket closed");
 
     return () => ws.close();
   }, [user, tokenVal, setSocket]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.onmessage = (event) => {
+      const res = JSON.parse(event.data);
+      if (res.event === "message") {
+        setMessages(res.payload);
+      }
+    };
+
+    return () => socket?.close();
+  }, [socket, setMessages]);
+
   if (!socket) {
-    return <div>connecting to ws...</div>;
+    return <div>Connecting to WebSocket...</div>;
   }
+
   if (!messagesData) {
     return null;
   }
 
-  console.log(messagesData);
-
   return (
     <div className="flex h-full overflow-y-auto p-4 bg-gray-50 custom-scrollbar flex-col-reverse">
-      <div className="flex flex-col space-y-4 ">
-        {/* Change to flex-col */}
-        {messagesData?.messages?.map((message, index) => (
+      <div className="flex flex-col space-y-4">
+        {messagesData?.messages?.map((message) => (
           <div
-            key={message?.senderId + (Math.random() * 100).toString()}
+            key={`${message?.senderId}-${message?.createdAt}`}
             className={`flex ${
               message?.senderId === userInfo?.id
                 ? "justify-end"
