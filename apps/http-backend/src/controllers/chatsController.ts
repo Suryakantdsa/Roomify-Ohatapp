@@ -104,9 +104,13 @@ const getChatMessages = async (req: Request, res: Response) => {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        room: { select: { name: true } },
         sender: { select: { id: true, name: true, avatar: true } },
         // : { select: { id: true, name: true, avatar: true } },
+      },
+    });
+    const roomDetails = await prismaClient.room.findUnique({
+      where: {
+        id: parseInt(roomId as string),
       },
     });
 
@@ -127,7 +131,7 @@ const getChatMessages = async (req: Request, res: Response) => {
       limit: pageSize,
       currentPage: page,
       totalPages: Math.ceil(totalMessages / pageSize),
-      data: messages,
+      data: { messages: messages, room: roomDetails },
     });
   } catch (error: any) {
     res.status(500).json({

@@ -16,7 +16,7 @@ const AllUser = () => {
     addUserForChatStore();
 
   const { setActiveMenuIndex, setMenuName } = useSidebarStore();
-  const { messages, resetMessage } = messageStore();
+  const { messages, setMessages } = messageStore();
   useEffect(() => {
     if (isAddUserButtonClicked) {
       fetchgetallUsersData();
@@ -50,7 +50,7 @@ const AllUser = () => {
                   setUserForChat(user);
                   setMenuName("Message");
                   setActiveMenuIndex(1);
-                  resetMessage();
+                  setMessages(null);
                 }}
               >
                 <Avatar seed={user.avatar} isSelected={false} />

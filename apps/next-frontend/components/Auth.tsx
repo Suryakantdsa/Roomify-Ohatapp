@@ -70,7 +70,7 @@ const Auth = ({ mode = "signup" }) => {
         })
           .then(async (res) => {
             const data = await res.json();
-            console.log(data);
+            // console.log(data);
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("user", JSON.stringify(data.user));
             router.push("/home");

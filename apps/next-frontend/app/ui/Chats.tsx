@@ -5,6 +5,9 @@ import inboxStore from "../../lib/features/chat/inboxStore";
 import { formatDate } from "../utils/formatDate";
 import messageStore from "../../lib/features/chat/mesagesStore";
 import EmptyState from "./EmptyState";
+import addUserForChatStore, {
+  roomBody,
+} from "../../lib/features/chat/addUserforChat";
 
 const Chats = () => {
   const baseUrl = "http://localhost:8002/api/v1";
@@ -12,7 +15,8 @@ const Chats = () => {
   const [activeUserChatClicked, setActiveUserchatClicked] = useState(0);
   const [chatId, setChatId] = useState(null);
   const { chatData, error, isInboxLoading, fetchInboxData } = inboxStore();
-  const { fetchMessagesData } = messageStore();
+  const { fetchMessagesData, messages } = messageStore();
+  const { setUserForChat } = addUserForChatStore();
 
   useEffect(() => {
     fetchInboxData(baseUrl);
@@ -21,6 +25,8 @@ const Chats = () => {
   useEffect(() => {
     if (chatId) {
       fetchMessagesData(chatId);
+      console.log(messages?.data.room);
+      // setUserForChat(messages?.data.room as roomBody);
     }
   }, [chatId]);
 
@@ -73,6 +79,7 @@ const Chats = () => {
             onClick={() => {
               setActiveUserchatClicked(chat.id);
               setChatId(chat.id);
+              setUserForChat(chat);
             }}
             className={`p-2 relative flex justify-between w-full items-center cursor-pointer border-pink-500 border-b  shadow-lg mt-3 
           ${activeUserChatClicked === chat.id ? "bg-pink-200" : "bg-gray-100"}

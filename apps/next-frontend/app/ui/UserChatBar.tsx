@@ -1,29 +1,51 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Send, Smile } from "lucide-react";
 import messageStore from "../../lib/features/chat/mesagesStore";
 import sendMessageStore from "../../lib/features/chat/sendMessage";
+import addUserForChatStore from "../../lib/features/chat/addUserforChat";
+import socketStore from "../../lib/features/socket/socketStore";
 
 const UserChatBar = () => {
   const [message, setMessage] = useState("");
-  const { messages } = messageStore();
-  const { fetchsendMessagesData } = sendMessageStore();
+  const { messages, fetchMessagesData, setMessages } = messageStore();
+  const { fetchsendMessagesData, sendMessages } = sendMessageStore();
+  const { setUserForChat, user } = addUserForChatStore();
+  const { setSocket, socket } = socketStore();
+  let userInfo: any = localStorage.getItem("user");
 
-  const handleSendMessage = (e: any) => {
+  // console.log(user);
+  useEffect(() => {}, [messages]);
+  const handleSendMessage = useCallback(() => {
     if (message.trim() !== "") {
-      alert(message);
       console.log("Message sent:", message); // Replace with actual send logic
-      setMessage(e.target.value); // Clear the input after sending
       let body;
       if (messages) {
         body = {
           content: message,
-          roomId: messages.data?.[0]?.roomId,
+          roomId: user?.id,
         };
       } else {
+        body = {
+          content: message,
+          reciverId: user?.id,
+        };
       }
-      fetchsendMessagesData({ content: message });
+      // fetchsendMessagesData(body);
+      setMessage("");
+      socket?.send(
+        JSON.stringify({
+          event: "chat-room",
+          payload: body,
+        })
+      );
+      sendMessages([
+        ...message,
+        { content: message, senderId: userInfo?.id, createdAt: new Date() },
+      ]);
+      // console.log(user);
+      // fetchMessagesData(user?.roomId);
     }
-  };
+  }, [message, messages, user, fetchMessagesData, fetchsendMessagesData]);
 
   return (
     <div className=" w-full bg-gray-300 border-t border-gray-300 p-4 flex items-center gap-4">
@@ -35,7 +57,7 @@ const UserChatBar = () => {
         placeholder="Type a message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSendMessage(e)}
+        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
         className="flex-1 p-2 bg-white border border-gray-300 rounded-md outline-none"
       />
       <button

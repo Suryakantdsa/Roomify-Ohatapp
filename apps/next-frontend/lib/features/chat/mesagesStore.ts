@@ -1,5 +1,6 @@
 import axios from "axios";
 import { create } from "zustand";
+import { roomBody } from "./addUserforChat";
 
 export interface Datum {
   id: number;
@@ -24,13 +25,13 @@ export interface MessageData {
   limit: number;
   currentPage: number;
   totalPages: number;
-  data: Datum[];
+  data: { messages: Datum[]; room: roomBody };
 }
 interface messageInterface {
   isMessageLoading: boolean;
   error: string | null;
   messages: MessageData | null;
-  resetMessage: () => void;
+  setMessages: (daata: any) => void;
   fetchMessagesData: (id: number) => void;
 }
 const baseUrl = "http://localhost:8002/api/v1";
@@ -38,7 +39,7 @@ const messageStore = create<messageInterface>((set) => ({
   error: null,
   isMessageLoading: false,
   messages: null,
-  resetMessage: () => set({ messages: null }),
+  setMessages: (data) => set({ messages: data }),
   fetchMessagesData: async (id) => {
     const token = localStorage.getItem("accessToken");
     set({ isMessageLoading: true });

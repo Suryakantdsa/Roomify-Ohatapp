@@ -1,18 +1,25 @@
 import { create } from "zustand";
-interface bodyData {
+export type userBody = {
   id: number;
   name: string;
   email: string;
   avatar: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
+};
+export type roomBody = {
+  id: number;
+  isGroup: boolean;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+type body = userBody | roomBody | null;
 interface addUserForChatInterface {
-  user: bodyData | null;
+  user: any;
   isAddUserButtonClicked: boolean;
   toggleAddUserButton: () => void;
-  setUserForChat: (data: bodyData) => void;
+  setUserForChat: (data: body) => void;
 }
 
 const addUserForChatStore = create<addUserForChatInterface>((set) => ({

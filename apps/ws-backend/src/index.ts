@@ -1,4 +1,26 @@
 import { WebSocketServer, WebSocket } from "ws";
+// import { checkUserToken } from "./utils/checkUserToken";
+import { prismaClient } from "@repo/db/client";
+
+import jwt from "jsonwebtoken";
+
+export function checkUserToken(token: string): string | null {
+  const JWT_SECRET = process.env.JWT_SECRET;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET as jwt.Secret);
+
+    if (typeof decoded === "string") {
+      return null;
+    }
+    if (!decoded || !decoded.userId) {
+      return null;
+    }
+
+    return decoded.userId;
+  } catch (error) {}
+
+  return null;
+}
 
 const wss = new WebSocketServer({ port: 8080 });
 console.log("websocket server is running on ws://localhost:8080");
@@ -7,8 +29,8 @@ interface User {
   socket: WebSocket | null;
   userId: string;
   roomId?: string[];
-  avatar: string;
-  name: string;
+  avatar?: string;
+  name?: string;
   phone?: string;
 }
 
@@ -63,7 +85,7 @@ interface JoinRoomRequest {
   event: Event.JOIN_ROOM;
   payload: {
     roomId: string;
-    userId: string;
+    userId?: string;
     avatar?: string;
     name?: string;
   };
@@ -82,8 +104,6 @@ interface ChatRoomRequest {
   payload: {
     roomId: string;
     message: string;
-    fromUserId: string;
-    createdAt?: string;
   };
 }
 interface ChatUserRequest {
@@ -110,12 +130,33 @@ function generateShortUUID() {
   return uuid.substring(0, 8);
 }
 
-wss.on("connection", (socket) => {
-  console.log("user connected", socket.eventNames);
+wss.on("connection", function connection(socket, request) {
+  const url = request.url;
+  if (!url) {
+    return;
+  }
+  const queryParam = new URLSearchParams(url.split("?")[1]);
+  const token = queryParam.get("token") || "";
+  const userId = checkUserToken(token);
 
-  socket.on("message", (body) => {
+  if (userId === null) {
+    socket.close();
+    return null;
+  }
+  allUser.push({
+    userId: userId,
+    socket: socket,
+    roomId: [],
+  });
+
+  socket.on("message", async (body) => {
     try {
-      const parseBody = JSON.parse(body.toString());
+      let parseBody;
+      if (typeof body !== "string") {
+        parseBody = JSON.parse(body.toString());
+      } else {
+        parseBody = JSON.parse(body);
+      }
 
       if (parseBody.event === Event.USER_JOIN) {
         const { event, payload } = parseBody as UserJoinRequest;
@@ -207,52 +248,64 @@ wss.on("connection", (socket) => {
       } else if (parseBody.event === Event.JOIN_ROOM) {
         const { event, payload } = parseBody as JoinRoomRequest;
 
-        const { roomId, userId, avatar, name } = payload;
+        const { roomId } = payload;
+        if (!roomId) {
+          socket.send(
+            JSON.stringify({
+              error: "roomId required",
+            })
+          );
+          return;
+        }
 
-        const userDetails = allUser.find((user) => user.userId === userId);
+        const userDetails = allUser.find((user) => user.socket === socket);
 
         if (!userDetails) {
           socket.send(
             JSON.stringify({
-              error: "Invalid userId",
+              error: "Invalid user",
             })
           );
           return;
         }
-        const roomDetails = rooms.find((room) => room.roomId === roomId);
+        if (!userDetails.roomId?.includes(roomId)) {
+          userDetails?.roomId?.push(roomId);
+        }
+        // const roomDetails = rooms.find((room) => room.roomId === roomId);
 
-        if (!roomDetails) {
-          socket.send(
-            JSON.stringify({
-              error: "invalid roomId",
-            })
-          );
-          return;
-        }
-        if (userDetails?.roomId?.includes(roomId)) {
-          socket.send(
-            JSON.stringify({
-              error: "Already joined the room " + roomId,
-            })
-          );
-          return;
-        }
-        userDetails.roomId = userDetails?.roomId || [];
-        userDetails.roomId.push(roomId);
+        // if (!roomDetails) {
+        //   socket.send(
+        //     JSON.stringify({
+        //       error: "invalid roomId",
+        //     })
+        //   );
+        //   return;
+        // }
+        // if (!userDetails?.roomId?.includes(roomId)) {
+        //   socket.send(
+        //     JSON.stringify({
+        //       error: "Already joined the room " + roomId,
+        //     })
+        //   );
+        //   return;
+        // }
+        // userDetails.roomId = userDetails?.roomId || [];
+        // userDetails.roomId.push(roomId);
 
-        socket.send(
-          JSON.stringify({
-            event: "joined_room",
-            payload: {
-              roomName: roomDetails.name,
-              roomId: roomDetails.roomId,
-              avatar: roomDetails.avatar,
-              joinedAt: new Date(),
-            },
-          })
-        );
-        const roomUser = allUser.filter((user) =>
-          user.roomId?.includes(roomId)
+        // socket.send(
+        //   JSON.stringify({
+        //     event: "joined_room",
+        //     payload: {
+        //       roomName: roomDetails.name,
+        //       roomId: roomDetails.roomId,
+        //       avatar: roomDetails.avatar,
+        //       joinedAt: new Date(),
+        //     },
+        //   })
+        // );
+
+        const roomUser = allUser.filter(
+          (user) => user.roomId?.includes(roomId) && user.userId !== userId
         );
 
         roomUser.forEach((user) => {
@@ -260,7 +313,7 @@ wss.on("connection", (socket) => {
             JSON.stringify({
               event: "user_joined_room",
               payload: {
-                roomId: roomDetails.roomId,
+                roomId: roomId,
                 joinedUser: {
                   name: userDetails.name,
                   avatar: userDetails.avatar,
@@ -272,10 +325,10 @@ wss.on("connection", (socket) => {
         });
       } else if (parseBody.event === Event.CHAT_ROOM) {
         const { event, payload } = parseBody as ChatRoomRequest;
-        const { roomId, fromUserId, message } = payload;
+        const { roomId, message } = payload;
 
-        const roomDetails = rooms.find((room) => room.roomId === roomId);
-        const userDetails = allUser.find((user) => user.userId === fromUserId);
+        // const roomDetails = rooms.find((room) => room.roomId === roomId);
+        const userDetails = allUser.find((user) => user.userId === userId);
 
         if (!userDetails) {
           socket.send(
@@ -285,16 +338,24 @@ wss.on("connection", (socket) => {
           );
           return;
         }
-        if (!roomDetails) {
-          socket.send(
-            JSON.stringify({
-              error: "Invalid roomId",
-            })
-          );
-          return;
-        }
-        const roomUsers = allUser.filter((user) =>
-          user.roomId?.includes(roomId)
+        // if (!roomDetails) {
+        //   socket.send(
+        //     JSON.stringify({
+        //       error: "Invalid roomId",
+        //     })
+        //   );
+        //   return;
+        // }
+        await prismaClient.message.create({
+          data: {
+            roomId: Number(roomId),
+            content: message,
+            senderId: Number(userId),
+          },
+        });
+
+        const roomUsers = allUser.filter(
+          (user) => user.roomId?.includes(roomId) && user?.userId !== userId
         );
         roomUsers.forEach((user) => {
           user.socket?.send(
@@ -302,8 +363,8 @@ wss.on("connection", (socket) => {
               event: "message",
               payload: {
                 roomId,
-                fromUserId,
-                message,
+                senderId: userId,
+                content: message,
                 senderName: userDetails.name,
                 senderAvatar: userDetails.avatar,
                 timestamp: new Date(),
