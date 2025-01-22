@@ -15,7 +15,7 @@ interface getallUserInterface {
   alluser: Users[] | null;
   fetchgetallUsersData: () => void;
 }
-const baseUrl = "http://localhost:8002/api/v1";
+const baseUrl = "http://localhost:8000/api/v1";
 const getallUserStore = create<getallUserInterface>((set) => ({
   error: null,
   isgetallUserLoading: false,

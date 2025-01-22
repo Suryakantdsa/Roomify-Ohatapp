@@ -5,7 +5,7 @@ import { prismaClient } from "@repo/db/client";
 import jwt from "jsonwebtoken";
 
 export function checkUserToken(token: string): string | null {
-  const JWT_SECRET = process.env.JWT_SECRET;
+  const JWT_SECRET = process.env.JWT_SECRET || "surya@1qee";
   try {
     const decoded = jwt.verify(token, JWT_SECRET as jwt.Secret);
 
@@ -268,9 +268,12 @@ wss.on("connection", function connection(socket, request) {
           );
           return;
         }
-        if (!userDetails.roomId?.includes(roomId)) {
-          userDetails?.roomId?.push(roomId);
-        }
+        console.log(userDetails.roomId);
+        console.log(userDetails.roomId?.includes(roomId));
+        userDetails.roomId = userDetails?.roomId || [];
+        userDetails.roomId.push(roomId);
+        // if (!userDetails.roomId?.includes(roomId)) {
+        // }
         // const roomDetails = rooms.find((room) => room.roomId === roomId);
 
         // if (!roomDetails) {
@@ -304,8 +307,8 @@ wss.on("connection", function connection(socket, request) {
         //   })
         // );
 
-        const roomUser = allUser.filter(
-          (user) => user.roomId?.includes(roomId) && user.userId !== userId
+        const roomUser = allUser.filter((user) =>
+          user.roomId?.includes(roomId)
         );
 
         roomUser.forEach((user) => {
@@ -326,6 +329,7 @@ wss.on("connection", function connection(socket, request) {
       } else if (parseBody.event === Event.CHAT_ROOM) {
         const { event, payload } = parseBody as ChatRoomRequest;
         const { roomId, message } = payload;
+        console.log(parseBody);
 
         // const roomDetails = rooms.find((room) => room.roomId === roomId);
         const userDetails = allUser.find((user) => user.userId === userId);
@@ -357,6 +361,8 @@ wss.on("connection", function connection(socket, request) {
         const roomUsers = allUser.filter(
           (user) => user.roomId?.includes(roomId) && user?.userId !== userId
         );
+        console.log(allUser);
+        console.log(roomUsers);
         roomUsers.forEach((user) => {
           user.socket?.send(
             JSON.stringify({

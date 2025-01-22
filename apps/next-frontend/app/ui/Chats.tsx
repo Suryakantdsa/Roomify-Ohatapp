@@ -10,13 +10,13 @@ import addUserForChatStore, {
 } from "../../lib/features/chat/addUserforChat";
 
 const Chats = () => {
-  const baseUrl = "http://localhost:8002/api/v1";
+  const baseUrl = "http://localhost:8000/api/v1";
 
   const [activeUserChatClicked, setActiveUserchatClicked] = useState(0);
   const [chatId, setChatId] = useState(null);
   const { chatData, error, isInboxLoading, fetchInboxData } = inboxStore();
-  const { fetchMessagesData, messages } = messageStore();
-  const { setUserForChat } = addUserForChatStore();
+  const { fetchMessagesData, messagesData } = messageStore();
+  const { setUserForChat, user } = addUserForChatStore();
 
   useEffect(() => {
     fetchInboxData(baseUrl);
@@ -25,7 +25,7 @@ const Chats = () => {
   useEffect(() => {
     if (chatId) {
       fetchMessagesData(chatId);
-      console.log(messages?.data.room);
+      console.log(messagesData?.room);
       // setUserForChat(messages?.data.room as roomBody);
     }
   }, [chatId]);
@@ -80,6 +80,7 @@ const Chats = () => {
               setActiveUserchatClicked(chat.id);
               setChatId(chat.id);
               setUserForChat(chat);
+              console.log(chat);
             }}
             className={`p-2 relative flex justify-between w-full items-center cursor-pointer border-pink-500 border-b  shadow-lg mt-3 
           ${activeUserChatClicked === chat.id ? "bg-pink-200" : "bg-gray-100"}

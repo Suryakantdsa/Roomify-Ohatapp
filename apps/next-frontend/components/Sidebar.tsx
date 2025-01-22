@@ -17,7 +17,9 @@ const Sidebar = () => {
     { id: 2, icon: <Users />, label: "Rooms" },
   ];
   let user = localStorage.getItem("user") as any;
-  user = JSON.parse(user);
+  if (!user) {
+    user = JSON.parse(user);
+  }
 
   return (
     <aside

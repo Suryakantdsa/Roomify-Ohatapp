@@ -28,7 +28,7 @@ const Auth = ({ mode = "signup" }) => {
     setPassword,
   } = useSignUpStore();
 
-  const baseUrl = "http://localhost:8002/api/v1";
+  const baseUrl = "http://localhost:8000/api/v1";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -26,6 +26,7 @@ const getChats = async (req: Request, res: Response) => {
             createdAt: "desc",
           },
         },
+
         participants: {
           where: { NOT: { id: userId } },
           select: {
@@ -57,6 +58,7 @@ const getChats = async (req: Request, res: Response) => {
         return {
           id: chat.id,
           reciverId: participant?.id,
+          reciverName: participant?.name,
           isGroup: chat.isGroup,
           name: participant?.name || "Unknown User",
           avatar: participant?.avatar || "/default.jpeg",
@@ -125,14 +127,15 @@ const getChatMessages = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json({
-      total: totalMessages,
-      skip: (page - 1) * pageSize,
-      limit: pageSize,
-      currentPage: page,
-      totalPages: Math.ceil(totalMessages / pageSize),
-      data: { messages: messages, room: roomDetails },
-    });
+    res.status(200).json(
+      // total: totalMessages,
+      // skip: (page - 1) * pageSize,
+      // limit: pageSize,
+      // currentPage: page,
+      // totalPages: Math.ceil(totalMessages / pageSize),
+      // data: { messages: messages, room: roomDetails },
+      { messages: messages, room: roomDetails }
+    );
   } catch (error: any) {
     res.status(500).json({
       message: "Internal server error: " + error.message,

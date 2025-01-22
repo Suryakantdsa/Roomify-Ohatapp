@@ -16,7 +16,7 @@ const AllUser = () => {
     addUserForChatStore();
 
   const { setActiveMenuIndex, setMenuName } = useSidebarStore();
-  const { messages, setMessages } = messageStore();
+  const { setMessages } = messageStore();
   useEffect(() => {
     if (isAddUserButtonClicked) {
       fetchgetallUsersData();

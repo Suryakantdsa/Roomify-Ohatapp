@@ -12,7 +12,7 @@ interface sendMessageInterface {
   sendMessages: any;
   fetchsendMessagesData: (data: bodyData) => void;
 }
-const baseUrl = "http://localhost:8002/api/v1";
+const baseUrl = "http://localhost:8000/api/v1";
 const sendMessageStore = create<sendMessageInterface>((set) => ({
   error: null,
   isSendMessageLoading: false,

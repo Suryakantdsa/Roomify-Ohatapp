@@ -5,12 +5,12 @@ import { roomBody } from "./addUserforChat";
 export interface Datum {
   id: number;
   content: string;
-  senderId: number;
+  senderId?: number;
   roomId: number;
-  isRead: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  sender: Sender;
+  isRead?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  sender?: Sender;
 }
 
 export interface Sender {
@@ -19,27 +19,38 @@ export interface Sender {
   avatar: string;
 }
 
+// export interface MessageData {
+//   total: number;
+//   skip: number;
+//   limit: number;
+//   currentPage: number;
+//   totalPages: number;
+//   data: { messages: Datum[]; room: roomBody };
+//
 export interface MessageData {
-  total: number;
-  skip: number;
-  limit: number;
-  currentPage: number;
-  totalPages: number;
-  data: { messages: Datum[]; room: roomBody };
+  messages: Datum[];
+  room: roomBody;
 }
+
 interface messageInterface {
   isMessageLoading: boolean;
   error: string | null;
-  messages: MessageData | null;
-  setMessages: (daata: any) => void;
+  messagesData: MessageData | null;
+  setMessages: (data: any) => void;
   fetchMessagesData: (id: number) => void;
 }
-const baseUrl = "http://localhost:8002/api/v1";
+const baseUrl = "http://localhost:8000/api/v1";
 const messageStore = create<messageInterface>((set) => ({
   error: null,
   isMessageLoading: false,
-  messages: null,
-  setMessages: (data) => set({ messages: data }),
+  messagesData: null,
+  setMessages: (data) =>
+    set((state: any) => ({
+      messagesData: {
+        ...state.messagesData,
+        messages: [...state.messagesData?.messages, data],
+      },
+    })),
   fetchMessagesData: async (id) => {
     const token = localStorage.getItem("accessToken");
     set({ isMessageLoading: true });
@@ -49,7 +60,11 @@ const messageStore = create<messageInterface>((set) => ({
           Authorization: `Bearer ${token}`,
         },
       });
-      set({ messages: response.data, isMessageLoading: false, error: null });
+      set({
+        messagesData: response.data,
+        isMessageLoading: false,
+        error: null,
+      });
       console.log(response.data);
     } catch (error: any) {
       set({

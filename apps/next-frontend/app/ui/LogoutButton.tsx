@@ -5,7 +5,7 @@ import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const LogoutButton = () => {
-  const baseUrl = "http://localhost:8002/api/v1";
+  const baseUrl = "http://localhost:8000/api/v1";
   const router = useRouter();
   const { isCollapsed } = useSidebarStore();
   const handleLogOut = async () => {
